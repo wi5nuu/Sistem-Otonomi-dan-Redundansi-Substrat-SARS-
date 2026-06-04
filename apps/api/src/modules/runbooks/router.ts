@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { eq, desc, asc, and, like } from 'drizzle-orm';
+import { TRPCError } from '@trpc/server';
 import { runbooks } from '@sars/schemas';
 import { createTRPCRouter, protectedProcedure, adminProcedure } from '../../trpc/router.js';
 
@@ -22,7 +23,7 @@ export const runbooksRouter = createTRPCRouter({
     .input(z.object({ id: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
       const [runbook] = await ctx.db.select().from(runbooks).where(eq(runbooks.id, input.id)).limit(1);
-      if (!runbook) throw new Error('Runbook not found');
+      if (!runbook) throw new TRPCError({ code: 'NOT_FOUND', message: 'Runbook not found' });
       return runbook;
     }),
 

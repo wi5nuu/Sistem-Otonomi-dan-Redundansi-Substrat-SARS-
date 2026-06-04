@@ -75,3 +75,66 @@ export const alertRuleSchema = z.object({
   cooldownMinutes: z.number().int().positive().default(5),
   channels: z.array(z.enum(['email', 'slack', 'pagerduty', 'webhook'])).min(1),
 });
+
+export const createAlertRuleSchema = alertRuleSchema;
+
+export const registerSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8).max(128),
+  name: z.string().min(1).max(255),
+});
+
+export const createAuditLogSchema = z.object({
+  action: z.string().min(1).max(100),
+  resource: z.string().min(1).max(100),
+  resourceId: z.string().min(1).max(255),
+  userId: z.string().uuid().optional(),
+  systemActor: z.string().optional(),
+  before: z.any().optional(),
+  after: z.any().optional(),
+  ipAddress: z.string().min(1).max(45),
+  userAgent: z.string().min(1),
+  sessionId: z.string().min(1).max(255),
+});
+
+export const createApprovalSchema = z.object({
+  title: z.string().min(1).max(500),
+  description: z.string().min(1),
+  type: approvalRequestTypeSchema,
+  payload: z.any().optional(),
+  requiredApprovers: z.number().int().positive().default(3),
+  expiresAt: z.string().datetime(),
+});
+
+export const createNodeSchema = z.object({
+  datacenterId: z.string().uuid(),
+  hostname: z.string().min(1).max(255),
+  ipAddress: z.string().min(1).max(45),
+  architecture: nodeArchitectureSchema.default('X86_64'),
+  vendor: z.string().min(1).max(100),
+  model: z.string().min(1).max(100),
+  cpuCores: z.number().int().positive(),
+  ramGb: z.number().int().positive(),
+});
+
+export const createDatacenterSchema = z.object({
+  regionId: z.string().uuid(),
+  name: z.string().min(1).max(255),
+  slug: z.string().min(1).max(100),
+  address: z.string().min(1),
+  lat: z.number(),
+  lng: z.number(),
+  tier: dcTierSchema.default('T2'),
+  powerCapacityKw: z.number().positive(),
+  coolingType: coolingTypeSchema.default('AIR'),
+});
+
+export const createNetworkLinkSchema = z.object({
+  sourceDcId: z.string().uuid(),
+  targetDcId: z.string().uuid(),
+  type: networkLinkTypeSchema,
+  bandwidthGbps: z.number().positive(),
+  latencyMs: z.number().min(0),
+  provider: z.string().min(1).max(255),
+  redundancyLevel: z.number().int().positive().default(1),
+});

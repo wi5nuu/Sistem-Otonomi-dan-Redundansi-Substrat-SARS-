@@ -1,11 +1,10 @@
 import { defineConfig } from 'drizzle-kit';
-import { env } from './src/config/env.js';
 
 export default defineConfig({
   schema: '../../packages/schemas/src/db/*.ts',
   out: './src/db/migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url: env.DATABASE_URL,
+    url: 'postgresql://sars:password@localhost:5432/sars_db',
   },
 });

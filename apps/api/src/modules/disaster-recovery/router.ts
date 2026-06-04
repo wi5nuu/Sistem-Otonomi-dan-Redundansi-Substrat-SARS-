@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { eq, desc, asc, and } from 'drizzle-orm';
+import { TRPCError } from '@trpc/server';
 import { incidents, incidentTimeline, failoverJobs, runbooks } from '@sars/schemas';
 import { incidentSeveritySchema, incidentStatusSchema } from '@sars/schemas';
 import { createTRPCRouter, protectedProcedure, adminProcedure } from '../../trpc/router.js';
@@ -23,7 +24,7 @@ export const disasterRecoveryRouter = createTRPCRouter({
     .input(z.object({ id: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
       const [incident] = await ctx.db.select().from(incidents).where(eq(incidents.id, input.id)).limit(1);
-      if (!incident) throw new Error('Incident not found');
+      if (!incident) throw new TRPCError({ code: 'NOT_FOUND', message: 'Incident not found' });
       return incident;
     }),
 

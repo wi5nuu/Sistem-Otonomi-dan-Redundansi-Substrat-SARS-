@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
+import { TRPCError } from '@trpc/server';
 import { createTRPCRouter, protectedProcedure, adminProcedure } from '../../trpc/router.js';
 import { createUserSchema, approvalActionSchema, auditLogFilterSchema } from '@sars/schemas';
 import { users, auditLogs, approvalRequests } from '@sars/schemas';
@@ -57,8 +58,8 @@ export const governanceRouter = createTRPCRouter({
       const request = await ctx.db.query.approvalRequests.findFirst({
         where: (req, { eq }) => eq(req.id, input.requestId),
       });
-      if (!request) throw new Error('Approval request not found');
-      if (request.status !== 'PENDING') throw new Error('Request already resolved');
+      if (!request) throw new TRPCError({ code: 'NOT_FOUND', message: 'Approval request not found' });
+      if (request.status !== 'PENDING') throw new TRPCError({ code: 'BAD_REQUEST', message: 'Request already resolved' });
 
       const newApprovals = request.currentApprovals + 1;
       const newStatus = newApprovals >= request.requiredApprovers ? 'APPROVED' : 'PENDING';

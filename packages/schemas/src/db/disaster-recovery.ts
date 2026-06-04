@@ -1,7 +1,7 @@
 import {
   pgTable, uuid, text, timestamp, varchar, boolean, integer, jsonb, index
 } from 'drizzle-orm/pg-core';
-import { nodes } from './compute.js';
+import { nodes } from './compute';
 
 export const incidents = pgTable('incidents', {
   id: uuid('id').defaultRandom().primaryKey(),

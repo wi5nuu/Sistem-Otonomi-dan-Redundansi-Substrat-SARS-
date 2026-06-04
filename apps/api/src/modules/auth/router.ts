@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { TRPCError } from '@trpc/server';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '../../trpc/router.js';
 
 export const authRouter = createTRPCRouter({
@@ -7,7 +8,7 @@ export const authRouter = createTRPCRouter({
       where: (users, { eq }) => eq(users.id, ctx.userId!),
       columns: { mfaSecret: false },
     });
-    if (!user) throw new Error('User not found');
+    if (!user) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found' });
     return user;
   }),
 
@@ -18,7 +19,7 @@ export const authRouter = createTRPCRouter({
         where: (users, { eq }) => eq(users.email, input.email),
       });
       if (!user || !user.isActive) {
-        throw new Error('Invalid credentials');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid credentials' });
       }
       return { success: true, userId: user.id, role: user.role };
     }),

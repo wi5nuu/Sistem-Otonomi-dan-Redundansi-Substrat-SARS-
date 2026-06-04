@@ -1,7 +1,7 @@
 import {
   pgTable, uuid, text, timestamp, varchar, doublePrecision, integer, index
 } from 'drizzle-orm/pg-core';
-import { datacenters } from './regions.js';
+import { datacenters } from './regions';
 
 export const nodes = pgTable('nodes', {
   id: uuid('id').defaultRandom().primaryKey(),

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sars-web
+  namespace: sars-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sars-web
+  template:
+    metadata:
+      labels:
+        app: sars-web
+    spec:
+      containers:
+        - name: web
+          image: sars-platform/web:latest
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: sars-env
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3000

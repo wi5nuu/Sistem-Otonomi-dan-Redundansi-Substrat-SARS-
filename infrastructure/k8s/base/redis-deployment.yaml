@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sars-redis
+  namespace: sars-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sars-redis
+  template:
+    metadata:
+      labels:
+        app: sars-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+          readinessProbe:
+            tcpSocket:
+              port: 6379

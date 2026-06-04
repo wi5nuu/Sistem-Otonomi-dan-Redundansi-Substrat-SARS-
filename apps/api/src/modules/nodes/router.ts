@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { eq, desc } from 'drizzle-orm';
+import { TRPCError } from '@trpc/server';
 import { nodes, nodeMetrics } from '@sars/schemas';
 import { createTRPCRouter, protectedProcedure } from '../../trpc/router.js';
 
@@ -16,7 +17,7 @@ export const nodesRouter = createTRPCRouter({
     .input(z.object({ id: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
       const [node] = await ctx.db.select().from(nodes).where(eq(nodes.id, input.id)).limit(1);
-      if (!node) throw new Error('Node not found');
+      if (!node) throw new TRPCError({ code: 'NOT_FOUND', message: 'Node not found' });
       return node;
     }),
 

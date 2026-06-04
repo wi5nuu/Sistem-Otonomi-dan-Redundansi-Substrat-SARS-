@@ -1,8 +1,8 @@
 import {
   pgTable, uuid, text, timestamp, varchar, boolean, index, jsonb
 } from 'drizzle-orm/pg-core';
-import { nodes } from './compute.js';
-import { datacenters } from './regions.js';
+import { nodes } from './compute';
+import { datacenters } from './regions';
 
 export const securityEvents = pgTable('security_events', {
   id: uuid('id').defaultRandom().primaryKey(),
