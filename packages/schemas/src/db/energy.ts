@@ -13,6 +13,7 @@ export const energySources = pgTable('energy_sources', {
   status: varchar('status', { length: 20 }).notNull().default('ACTIVE'),
   contractExpiresAt: timestamp('contract_expires_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
   dcIdx: index('idx_energy_dc').on(table.datacenterId),
 }));
@@ -37,6 +38,7 @@ export const upsSystems = pgTable('ups_systems', {
   estimatedRuntimeMinutes: integer('estimated_runtime_minutes').notNull(),
   status: varchar('status', { length: 20 }).notNull().default('ONLINE'),
   lastTestedAt: timestamp('last_tested_at'),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
   dcUpsIdx: index('idx_ups_dc').on(table.datacenterId),
 }));

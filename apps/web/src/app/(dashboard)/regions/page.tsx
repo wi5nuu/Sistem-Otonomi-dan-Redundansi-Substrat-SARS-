@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sars/uicard';
+import { Badge } from '@sars/uibadge';
 import { Globe, Server, ArrowRight, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 
 const regions = [

@@ -18,6 +18,7 @@ export const nodes = pgTable('nodes', {
   uptimeSeconds: integer('uptime_seconds').notNull().default(0),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'),
 }, (table) => ({
   dcIdx: index('idx_nodes_datacenter').on(table.datacenterId),
   hostnameIdx: index('idx_nodes_hostname').on(table.hostname),

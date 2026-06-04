@@ -14,6 +14,7 @@ export const storageClusters = pgTable('storage_clusters', {
   erasureCodingScheme: varchar('erasure_coding_scheme', { length: 50 }).default('RS-4+2'),
   status: varchar('status', { length: 20 }).notNull().default('ONLINE'),
   lastIntegrityCheckAt: timestamp('last_integrity_check_at'),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
   dcIdx: index('idx_storage_dc').on(table.datacenterId),
 }));

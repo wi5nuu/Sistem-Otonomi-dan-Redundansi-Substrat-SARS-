@@ -28,6 +28,7 @@ export const datacenters = pgTable('datacenters', {
   coolingType: varchar('cooling_type', { length: 20 }).notNull().default('AIR'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'),
 }, (table) => ({
   regionIdx: index('idx_datacenters_region').on(table.regionId),
   slugIdx: index('idx_datacenters_slug').on(table.slug),

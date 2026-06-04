@@ -1,7 +1,7 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sars/uicard';
+import { Badge } from '@sars/uibadge';
 import { Network, Radio, Activity, Wifi, WifiOff } from 'lucide-react';
 
 const links = [

@@ -32,16 +32,19 @@ export const auditRouter = createTRPCRouter({
 
     if (logs.length === 0) return { valid: true, totalEntries: 0 };
 
-    let chainValid = true;
-    for (let i = 1; i < logs.length; i++) {
-      const prev = logs[i - 1]!;
-      const curr = logs[i]!;
-      if (!curr.immutableHash || !prev.immutableHash) {
-        chainValid = false;
-        break;
+    let prevHash = '0'.repeat(96);
+    for (const log of logs) {
+      const { immutableHash, ...rest } = log;
+      const content = JSON.stringify({ ...rest, previousHash: prevHash });
+      const hb = await crypto.subtle.digest('SHA-384', new TextEncoder().encode(content));
+      const calculatedHash = Array.from(new Uint8Array(hb)).map((b) => b.toString(16).padStart(2, '0')).join('');
+      
+      if (calculatedHash !== immutableHash) {
+        return { valid: false, totalEntries: logs.length, brokenAt: log.id };
       }
+      prevHash = calculatedHash;
     }
 
-    return { valid: chainValid, totalEntries: logs.length };
+    return { valid: true, totalEntries: logs.length };
   }),
 });

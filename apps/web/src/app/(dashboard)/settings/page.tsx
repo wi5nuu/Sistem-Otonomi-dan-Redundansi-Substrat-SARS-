@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@sars/uicard';
+import { Badge } from '@sars/uibadge';
 import { User, Bell, Moon, Sun, Shield, Mail, Smartphone, Save } from 'lucide-react';
 
 const notificationChannels = [

@@ -8,6 +8,7 @@ export const organizations = pgTable('organizations', {
   slug: varchar('slug', { length: 100 }).notNull().unique(),
   type: varchar('type', { length: 30 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const users = pgTable('users', {
@@ -20,6 +21,8 @@ export const users = pgTable('users', {
   lastLoginAt: timestamp('last_login_at'),
   organizationId: uuid('organization_id').notNull().references(() => organizations.id),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at'),
   isActive: boolean('is_active').notNull().default(true),
 }, (table) => ({
   emailIdx: index('idx_users_email').on(table.email),
@@ -39,6 +42,7 @@ export const approvalRequests = pgTable('approval_requests', {
   status: varchar('status', { length: 20 }).notNull().default('PENDING'),
   expiresAt: timestamp('expires_at').notNull(),
   resolvedAt: timestamp('resolved_at'),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
   statusIdx: index('idx_approval_req_status').on(table.status),
   requesterIdx: index('idx_approval_req_requester').on(table.requestedBy),

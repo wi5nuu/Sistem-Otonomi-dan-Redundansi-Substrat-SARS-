@@ -13,6 +13,7 @@ export const networkLinks = pgTable('network_links', {
   provider: varchar('provider', { length: 255 }).notNull(),
   status: varchar('status', { length: 20 }).notNull().default('ACTIVE'),
   redundancyLevel: integer('redundancy_level').notNull().default(1),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
   sourceIdx: index('idx_network_source').on(table.sourceDcId),
   targetIdx: index('idx_network_target').on(table.targetDcId),

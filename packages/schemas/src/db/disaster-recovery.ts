@@ -17,6 +17,7 @@ export const incidents = pgTable('incidents', {
   rootCause: text('root_cause'),
   postMortemUrl: text('post_mortem_url'),
   createdBy: uuid('created_by').notNull(),
+  deletedAt: timestamp('deleted_at'),
 }, (table) => ({
   severityIdx: index('idx_incidents_severity').on(table.severity),
   statusIdx: index('idx_incidents_status').on(table.status),
