@@ -1,0 +1,51 @@
+# --- Environment & Secrets ---
+.env
+.env.local
+.env.production
+.env.development
+.env.test
+
+# --- Dependencies ---
+node_modules/
+.pnpm-store/
+.pnpm/
+.npm/
+
+# --- Build Output ---
+dist/
+.next/
+build/
+out/
+.turbo/
+*.tsbuildinfo
+
+# --- IDE & Editor ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- Logs ---
+*.log
+logs/
+npm-debug.log*
+pnpm-debug.log*
+
+# --- Coverage & Tests ---
+coverage/
+.nyc_output/
+
+# --- Docker ---
+docker-data/
+
+# --- OS Files ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Temp ---
+tmp/
+temp/

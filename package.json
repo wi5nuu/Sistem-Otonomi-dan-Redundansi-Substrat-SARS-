@@ -1,0 +1,32 @@
+{
+  "name": "sars-platform",
+  "private": true,
+  "description": "SARS Control Center — Global Infrastructure Command & Resilience Platform",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "packages/config/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "clean": "turbo run clean",
+    "db:generate": "turbo run db:generate",
+    "db:migrate": "turbo run db:migrate",
+    "db:seed": "turbo run db:seed",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.4.0",
+    "turbo": "^2.3.0",
+    "typescript": "^5.7.0"
+  }
+}

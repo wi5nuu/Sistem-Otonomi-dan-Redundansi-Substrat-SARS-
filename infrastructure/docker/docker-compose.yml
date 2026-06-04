@@ -1,0 +1,118 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: timescale/timescaledb-ha:pg16-latest
+    container_name: sars-postgres
+    environment:
+      POSTGRES_DB: sars_db
+      POSTGRES_USER: sars
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/home/postgres/pgdata
+      - ./postgres-init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sars"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: sars-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.12
+    container_name: sars-meilisearch
+    environment:
+      MEILI_MASTER_KEY: your-master-key
+      MEILI_NO_ANALYTICS: "true"
+    ports:
+      - "7700:7700"
+    volumes:
+      - meilisearch-data:/meili_data
+
+  minio:
+    image: minio/minio:latest
+    container_name: sars-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: sars-grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: sars-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus-data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  loki:
+    image: grafana/loki:latest
+    container_name: sars-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki-data:/loki
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: sars-tempo
+    ports:
+      - "3200:3200"
+      - "4318:4318"
+    volumes:
+      - tempo-data:/var/tempo
+
+  traefik:
+    image: traefik:v3.3
+    container_name: sars-traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+volumes:
+  postgres-data:
+  redis-data:
+  meilisearch-data:
+  minio-data:
+  grafana-data:
+  prometheus-data:
+  loki-data:
+  tempo-data:
