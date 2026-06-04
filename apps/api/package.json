@@ -16,9 +16,9 @@
     "clean": "rm -rf .turbo dist"
   },
   "dependencies": {
-    "@sars/schemas": "workspace:*",
-    "@sars/types": "workspace:*",
-    "@sars/utils": "workspace:*",
+    "@sars/schemas": "*",
+    "@sars/types": "*",
+    "@sars/utils": "*",
     "@trpc/server": "^11.0.0",
     "@trpc/client": "^11.0.0",
     "fastify": "^5.0.0",
@@ -39,10 +39,15 @@
     "meilisearch": "^0.44.0",
     "socket.io": "^4.8.0",
     "bullmq": "^5.34.0",
-    "@opentelemetry/api": "^1.9.0"
+    "eventemitter2": "^6.4.0",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/sdk-node": "^0.57.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.57.0",
+    "@opentelemetry/instrumentation-http": "^0.57.0",
+    "@opentelemetry/instrumentation-fastify": "^0.43.0"
   },
   "devDependencies": {
-    "@sars/config-tsconfig": "workspace:*",
+    "@sars/config-tsconfig": "*",
     "@types/bcrypt": "^5.0.0",
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",

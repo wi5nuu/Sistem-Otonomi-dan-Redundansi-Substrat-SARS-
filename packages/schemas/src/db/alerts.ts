@@ -11,7 +11,7 @@ export const alertRules = pgTable('alert_rules', {
   threshold: integer('threshold').notNull(),
   severity: varchar('severity', { length: 10 }).notNull(),
   cooldownMinutes: integer('cooldown_minutes').notNull().default(5),
-  channels: text('channels').array().notNull().default('{}'),
+  channels: text('channels').array().notNull().default([]),
   isActive: boolean('is_active').notNull().default(true),
   createdBy: uuid('created_by').notNull(),
 }, (table) => ({

@@ -29,17 +29,17 @@ async function seed() {
   }).returning();
 
   const usersData = [
-    { email: 'superadmin@sars.io', name: 'Super Admin', role: 'SUPER_ADMIN', orgId: orgOperator.id },
-    { email: 'admin@sars.io', name: 'Admin User', role: 'ADMIN', orgId: orgOperator.id },
-    { email: 'operator@sars.io', name: 'Operator User', role: 'OPERATOR', orgId: orgOperator.id },
-    { email: 'auditor@sars.io', name: 'Auditor User', role: 'AUDITOR', orgId: orgAuditor.id },
-    { email: 'viewer@sars.io', name: 'Viewer User', role: 'VIEWER', orgId: orgBoard.id },
+    { email: 'superadmin@sars.io', name: 'Super Admin', role: 'SUPER_ADMIN', orgId: orgOperator!.id },
+    { email: 'admin@sars.io', name: 'Admin User', role: 'ADMIN', orgId: orgOperator!.id },
+    { email: 'operator@sars.io', name: 'Operator User', role: 'OPERATOR', orgId: orgOperator!.id },
+    { email: 'auditor@sars.io', name: 'Auditor User', role: 'AUDITOR', orgId: orgAuditor!.id },
+    { email: 'viewer@sars.io', name: 'Viewer User', role: 'VIEWER', orgId: orgBoard!.id },
   ];
 
   const createdUsers = [];
   for (const u of usersData) {
     const [user] = await db.insert(users).values({
-      email: u.email, name: u.name, role: u.role as any,
+      email: u.email, name: u.name, role: u.role,
       organizationId: u.orgId, isActive: true,
     }).returning();
     createdUsers.push(user);
@@ -78,9 +78,9 @@ async function seed() {
         address: `${dcNamesByRegion[ri]![dci]!}, ${region.name}`,
         lat: region.lat + (dci - 1) * 0.5,
         lng: region.lng + (dci - 1) * 0.5,
-        tier: ['T1', 'T2', 'T3'][dci]! as any,
+        tier: ['T1', 'T2', 'T3'][dci]!,
         powerCapacityKw: 5000 + Math.floor(Math.random() * 10000),
-        coolingType: (['LIQUID', 'HYBRID', 'AIR'][dci]!) as any,
+        coolingType: (['LIQUID', 'HYBRID', 'AIR'][dci]!),
       }).returning();
       createdDcs.push(dc);
     }
@@ -97,8 +97,8 @@ async function seed() {
       const a = archs[0]![ni % 10]!;
       const statuses: Array<'ACTIVE' | 'ACTIVE' | 'ACTIVE' | 'DEGRADED'> = ['ACTIVE', 'ACTIVE', 'ACTIVE', 'DEGRADED'];
       const [node] = await db.insert(nodes).values({
-        datacenterId: dc.id,
-        hostname: `node-${dc.slug}-${String(ni + 1).padStart(3, '0')}`,
+        datacenterId: dc!.id,
+        hostname: `node-${dc!.slug}-${String(ni + 1).padStart(3, '0')}`,
         ipAddress: `10.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${ni + 1}`,
         architecture: a,
         vendor: vendors[vi]!,
@@ -118,7 +118,7 @@ async function seed() {
       for (let h = 0; h < 24; h += 4) {
         ts.setHours(h);
         await db.insert(nodeMetrics).values({
-          nodeId: node.id, timestamp: new Date(ts),
+          nodeId: node!.id, timestamp: new Date(ts),
           cpuPercent: 20 + Math.random() * 60,
           ramPercent: 30 + Math.random() * 50,
           networkInMbps: 100 + Math.random() * 900,
@@ -140,13 +140,13 @@ async function seed() {
     ];
     for (const et of types[Math.floor(Math.random() * types.length)]!) {
       await db.insert(energySources).values({
-        datacenterId: dc.id, type: et, provider: `${et} Energy Co`,
+        datacenterId: dc!.id, type: et, provider: `${et} Energy Co`,
         capacityKw: 1000 + Math.floor(Math.random() * 4000),
         currentOutputKw: 500 + Math.floor(Math.random() * 2000), status: 'ACTIVE',
       });
     }
     await db.insert(upsSystems).values({
-      datacenterId: dc.id, name: `${dc.name}-UPS-1`,
+      datacenterId: dc!.id, name: `${dc!.name}-UPS-1`,
       capacityKwh: 500 + Math.floor(Math.random() * 1500),
       currentChargePercent: 60 + Math.random() * 40,
       estimatedRuntimeMinutes: 15 + Math.floor(Math.random() * 60),
@@ -154,7 +154,7 @@ async function seed() {
     });
   }
 
-  const linkTypes: Array<'DARK_FIBER' | 'LEASED_LINE' | 'SATELLITE' | 'INTERNET'>[] = ['DARK_FIBER', 'LEASED_LINE', 'SATELLITE', 'INTERNET'];
+  const linkTypes: ('DARK_FIBER' | 'LEASED_LINE' | 'SATELLITE' | 'INTERNET')[] = ['DARK_FIBER', 'LEASED_LINE', 'SATELLITE', 'INTERNET'];
   for (let i = 0; i < 50; i++) {
     const si = Math.floor(Math.random() * createdDcs.length);
     let ti = Math.floor(Math.random() * createdDcs.length);
@@ -204,7 +204,7 @@ async function seed() {
     await db.insert(certificates).values({
       domain: c.domain, issuer: 'Let\'s Encrypt', algorithm: 'RSA-4096',
       validFrom, validUntil, autoRenew: true,
-      status: c.days <= 30 ? 'EXPIRING' : 'VALID' as any,
+      status: c.days <= 30 ? 'EXPIRING' : 'VALID',
     });
   }
 
@@ -226,20 +226,20 @@ async function seed() {
     detectedAt: new Date(Date.now() - 1800000), createdBy: createdUsers[1]!.id,
   }).returning();
 
-  const timelineData = [
-    { iid: inc1.id, action: 'Incident detected by monitoring system', at: 'SYSTEM' },
-    { iid: inc1.id, action: 'PagerDuty notification sent', at: 'SYSTEM' },
-    { iid: inc1.id, action: 'Incident acknowledged by operator', at: 'HUMAN', aid: createdUsers[2]!.id },
-    { iid: inc1.id, action: 'DNS failover initiated', at: 'SYSTEM' },
-    { iid: inc2.id, action: 'Storage latency threshold exceeded', at: 'SYSTEM' },
-    { iid: inc2.id, action: 'Auto-scaling triggered', at: 'SYSTEM' },
-    { iid: inc3.id, action: 'UPS test cycle initiated', at: 'SYSTEM' },
-    { iid: inc3.id, action: 'Battery level below 30%', at: 'SYSTEM' },
+  const timelineData: Array<{ iid: string; action: string; at: 'SYSTEM' | 'HUMAN'; aid?: string }> = [
+    { iid: inc1!.id, action: 'Incident detected by monitoring system', at: 'SYSTEM' },
+    { iid: inc1!.id, action: 'PagerDuty notification sent', at: 'SYSTEM' },
+    { iid: inc1!.id, action: 'Incident acknowledged by operator', at: 'HUMAN', aid: createdUsers[2]!.id },
+    { iid: inc1!.id, action: 'DNS failover initiated', at: 'SYSTEM' },
+    { iid: inc2!.id, action: 'Storage latency threshold exceeded', at: 'SYSTEM' },
+    { iid: inc2!.id, action: 'Auto-scaling triggered', at: 'SYSTEM' },
+    { iid: inc3!.id, action: 'UPS test cycle initiated', at: 'SYSTEM' },
+    { iid: inc3!.id, action: 'Battery level below 30%', at: 'SYSTEM' },
   ];
   for (const t of timelineData) {
     await db.insert(incidentTimeline).values({
-      incidentId: t.iid, action: t.action, actorType: t.at as any,
-      actorId: (t as any).aid || null,
+      incidentId: t.iid, action: t.action, actorType: t.at,
+      actorId: t.aid ?? null,
     });
   }
 
@@ -273,7 +273,7 @@ async function seed() {
     const actions = ['user.login', 'node.update', 'alert.acknowledge', 'incident.create', 'config.change', 'approval.create', 'runbook.execute'];
     const resources = ['users', 'nodes', 'alerts', 'incidents', 'config', 'approvals', 'runbooks'];
     for (let i = 0; i < 200; i++) {
-      const entry = {
+      const base = {
         userId: Math.random() > 0.3 ? createdUsers[Math.floor(Math.random() * createdUsers.length)]!.id : null,
         systemActor: Math.random() > 0.7 ? 'system-cron' : null,
         action: actions[Math.floor(Math.random() * actions.length)]!,
@@ -283,14 +283,11 @@ async function seed() {
         ipAddress: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
         userAgent: 'SARS-Agent', sessionId: crypto.randomUUID(),
         timestamp: new Date(Date.now() - Math.random() * 86400000 * 30),
-        previousHash: prevHash,
-      } as any;
-      const content = JSON.stringify(entry);
+      };
+      const content = JSON.stringify({ ...base, previousHash: prevHash });
       const hb = await crypto.subtle.digest('SHA-384', new TextEncoder().encode(content));
       prevHash = Array.from(new Uint8Array(hb)).map((b) => b.toString(16).padStart(2, '0')).join('');
-      entry.immutableHash = prevHash;
-      delete entry.previousHash;
-      entries.push(entry);
+      entries.push({ ...base, immutableHash: prevHash });
     }
     await db.insert(auditLogs).values(entries);
     console.log(`  ✓ Created ${(batch + 1) * 200} audit log entries`);
@@ -303,8 +300,8 @@ async function seed() {
       const s = statuses[Math.floor(Math.random() * statuses.length)]!;
       const next = new Date(Date.now() + (30 + Math.floor(Math.random() * 60)) * 86400000);
       await db.insert(complianceChecks).values({
-        checkName: `${framework} - ${region.code}`, framework: framework as any,
-        regionCode: region.code, status: s as any,
+        checkName: `${framework} - ${region!.code}`, framework: framework,
+        regionCode: region!.code, status: s,
         details: s === 'PASS' ? `All ${framework} controls compliant` : `Control #42 failed`,
         checkedAt: new Date(), nextCheckAt: next,
       });
@@ -316,7 +313,7 @@ async function seed() {
     for (const tier of tiers) {
       const totalTb = tier === 'HOT' ? 500 + Math.floor(Math.random() * 500) : tier === 'WARM' ? 1000 + Math.floor(Math.random() * 1000) : 2000 + Math.floor(Math.random() * 3000);
       const [cluster] = await db.insert(storageClusters).values({
-        datacenterId: dc.id, name: `${dc.name}-${tier}`, tier: tier as any,
+        datacenterId: dc!.id, name: `${dc!.name}-${tier}`, tier: tier,
         totalTb, usedTb: totalTb * (0.3 + Math.random() * 0.5),
         replicationFactor: tier === 'HOT' ? 3 : 2,
         erasureCodingScheme: tier === 'HOT' ? 'RS-4+2' : 'RS-6+3',
@@ -324,7 +321,7 @@ async function seed() {
       }).returning();
       for (let h = 0; h < 72; h++) {
         await db.insert(storageMetrics).values({
-          clusterId: cluster.id, timestamp: new Date(Date.now() - h * 3600000),
+          clusterId: cluster!.id, timestamp: new Date(Date.now() - h * 3600000),
           readIops: 1000 + Math.random() * 9000, writeIops: 500 + Math.random() * 4500,
           readLatencyMs: 0.5 + Math.random() * 4, writeLatencyMs: 1 + Math.random() * 6,
           throughputMbps: 200 + Math.random() * 800,
@@ -334,11 +331,11 @@ async function seed() {
   }
 
   const alertData = [
-    { severity: 'CRITICAL' as const, title: 'Node 10.0.1.45 offline', message: 'No heartbeat for 5 min', status: 'FIRING' as const },
-    { severity: 'HIGH' as const, title: 'Storage capacity 82%', message: 'HOT-01 cluster near full', status: 'FIRING' as const },
-    { severity: 'HIGH' as const, title: 'Certificate expiring', message: '*.sars.io in 7 days', status: 'ACKNOWLEDGED' as const },
-    { severity: 'MEDIUM' as const, title: 'Latency > 150ms', message: 'Transatlantic link degraded', status: 'FIRING' as const },
-    { severity: 'LOW' as const, title: 'UPS test overdue', message: 'Not tested in 30 days', status: 'RESOLVED' as const },
+    { severity: 'CRITICAL' as const, title: 'Node 10.0.1.45 offline', message: 'No heartbeat for 5 min', affectedResource: 'node:10.0.1.45', status: 'FIRING' as const },
+    { severity: 'HIGH' as const, title: 'Storage capacity 82%', message: 'HOT-01 cluster near full', affectedResource: 'cluster:HOT-01', status: 'FIRING' as const },
+    { severity: 'HIGH' as const, title: 'Certificate expiring', message: '*.sars.io in 7 days', affectedResource: 'cert:*.sars.io', status: 'ACKNOWLEDGED' as const },
+    { severity: 'MEDIUM' as const, title: 'Latency > 150ms', message: 'Transatlantic link degraded', affectedResource: 'link:transatlantic', status: 'FIRING' as const },
+    { severity: 'LOW' as const, title: 'UPS test overdue', message: 'Not tested in 30 days', affectedResource: 'ups:unknown', status: 'RESOLVED' as const },
   ];
   for (const a of alertData) {
     await db.insert(alerts).values(a);

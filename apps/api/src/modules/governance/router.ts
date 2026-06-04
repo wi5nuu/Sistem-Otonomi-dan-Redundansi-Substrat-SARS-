@@ -1,6 +1,8 @@
 import { z } from 'zod';
+import { eq } from 'drizzle-orm';
 import { createTRPCRouter, protectedProcedure, adminProcedure } from '../../trpc/router.js';
 import { createUserSchema, approvalActionSchema, auditLogFilterSchema } from '@sars/schemas';
+import { users, auditLogs, approvalRequests } from '@sars/schemas';
 
 export const governanceRouter = createTRPCRouter({
   listUsers: adminProcedure.query(async ({ ctx }) => {
@@ -21,15 +23,14 @@ export const governanceRouter = createTRPCRouter({
     .input(auditLogFilterSchema)
     .query(async ({ ctx, input }) => {
       const { page, pageSize, ...filters } = input;
-      const conditions = [];
-      if (filters.action) conditions.push({ action: filters.action });
-      if (filters.resource) conditions.push({ resource: filters.resource });
-      if (filters.userId) conditions.push({ userId: filters.userId });
 
       const items = await ctx.db.query.auditLogs.findMany({
-        where: (logs, { eq, and }) => {
-          const conds = conditions.map((c) => eq(logs[c.key], c.value));
-          return and(...conds);
+        where: (logs, { and, eq }) => {
+          const conds: ReturnType<typeof eq>[] = [];
+          if (filters.action) conds.push(eq(logs.action, filters.action));
+          if (filters.resource) conds.push(eq(logs.resource, filters.resource));
+          if (filters.userId) conds.push(eq(logs.userId, filters.userId));
+          return conds.length > 0 ? and(...conds) : undefined;
         },
         orderBy: (logs, { desc }) => [desc(logs.timestamp)],
         limit: pageSize,
@@ -46,7 +47,7 @@ export const governanceRouter = createTRPCRouter({
         where: input?.status
           ? (req, { eq }) => eq(req.status, input.status!)
           : undefined,
-        orderBy: (req, { desc }) => [desc(req.createdAt)],
+        orderBy: (req, { desc }) => [desc(req.expiresAt)],
       });
     }),
 

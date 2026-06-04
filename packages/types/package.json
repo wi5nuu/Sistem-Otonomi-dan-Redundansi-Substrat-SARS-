@@ -11,7 +11,7 @@
     "clean": "rm -rf .turbo"
   },
   "devDependencies": {
-    "@sars/config-tsconfig": "workspace:*",
+    "@sars/config-tsconfig": "*",
     "typescript": "^5.7.0"
   }
 }

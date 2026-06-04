@@ -3,9 +3,9 @@ import { db } from '../db/index.js';
 
 export interface TRPCContext {
   db: typeof db;
-  userId?: string;
-  userRole?: string;
-  orgId?: string;
+  userId: string | undefined;
+  userRole: string | undefined;
+  orgId: string | undefined;
   req: FastifyRequest;
   res: FastifyReply;
 }

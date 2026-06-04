@@ -10,9 +10,9 @@ export async function buildApp() {
   const app = Fastify({
     logger: {
       level: env.LOG_LEVEL,
-      transport: env.NODE_ENV === 'development'
-        ? { target: 'pino-pretty', options: { colorize: true } }
-        : undefined,
+      ...(env.NODE_ENV === 'development'
+        ? { transport: { target: 'pino-pretty', options: { colorize: true } } }
+        : {}),
     },
   });
 
@@ -50,13 +50,14 @@ export async function buildApp() {
     });
   });
 
-  app.setErrorHandler((error, _request, reply) => {
-    app.log.error(error);
-    const statusCode = error.statusCode ?? 500;
+  app.setErrorHandler((error: unknown, _request, reply) => {
+    const err = error as { statusCode?: number; message?: string; code?: string };
+    app.log.error(err);
+    const statusCode = err.statusCode ?? 500;
     reply.status(statusCode).send({
       error: {
-        message: statusCode === 500 ? 'Internal server error' : error.message,
-        code: error.code ?? 'INTERNAL_ERROR',
+        message: statusCode === 500 ? 'Internal server error' : err.message,
+        code: err.code ?? 'INTERNAL_ERROR',
       },
     });
   });
